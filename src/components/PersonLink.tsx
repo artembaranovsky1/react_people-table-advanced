@@ -10,7 +10,6 @@ type Props = {
 export const PersonLink: React.FC<Props> = ({ person, people }) => {
   const { slug } = useParams();
 
-
   const motherIsActive =
     person.motherName && people.some(p => p.name === person.motherName);
 

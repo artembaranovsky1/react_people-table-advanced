@@ -1,14 +1,12 @@
 import { useSearchParams } from 'react-router-dom';
-import { useState } from 'react';
 
 export const PeopleFilters = () => {
-  const [isActiveButtonAll, setActiveButtonAll] = useState(false);
-
   const [searchParams, setSearchParams] = useSearchParams();
 
   const sex = searchParams.get('sex') || null;
   const currentCenturies = searchParams.getAll('centuries');
   const query = searchParams.get('query') || '';
+  const hasCenturies = searchParams.has('centuries');
 
   const toggleCentury = century => {
     const newParams = new URLSearchParams(searchParams);
@@ -16,6 +14,7 @@ export const PeopleFilters = () => {
 
     if (currentCenturies.includes(value)) {
       const updatedCenturies = currentCenturies.filter(c => c !== value);
+
       newParams.delete('centuries');
       updatedCenturies.forEach(c => newParams.append('centuries', c));
     } else {
@@ -70,7 +69,15 @@ export const PeopleFilters = () => {
             value={query}
             className="input"
             placeholder="Search"
-            onChange={event => handleFilterChange('query', event.target.value)}
+            onChange={event => {
+              const value = event.target.value;
+
+              if (value.length === 0) {
+                handleFilterChange('query', null);
+              } else {
+                handleFilterChange('query', value);
+              }
+            }}
           />
 
           <span className="icon is-left">
@@ -88,7 +95,6 @@ export const PeopleFilters = () => {
                 data-cy="century"
                 className={`button mr-1 ${currentCenturies.includes(c.toString()) ? 'is-info' : ''}`}
                 onClick={() => {
-                  setActiveButtonAll(false);
                   toggleCentury(c);
                 }}
               >
@@ -100,16 +106,14 @@ export const PeopleFilters = () => {
           <div className="level-right ml-4">
             <a
               data-cy="centuryALL"
-              // className="button is-success is-outlined"
               className={
-                isActiveButtonAll
+                !hasCenturies
                   ? 'button is-success'
                   : 'button is-success is-outlined'
               }
               onClick={() => {
                 const newParams = new URLSearchParams(searchParams);
 
-                setActiveButtonAll(true);
                 newParams.delete('centuries');
                 setSearchParams(newParams);
               }}
@@ -129,8 +133,6 @@ export const PeopleFilters = () => {
             newParams.delete('sex');
             newParams.delete('centuries');
             newParams.delete('query');
-
-            setActiveButtonAll(false);
 
             setSearchParams(newParams);
           }}

@@ -28,8 +28,6 @@ createRoot(document.getElementById('root') as HTMLDivElement).render(
 
         <Route path="*" element={<NotFoundPage />} />
       </Route>
-
-
     </Routes>
   </Router>,
 );

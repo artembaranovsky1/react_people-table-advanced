@@ -11,29 +11,60 @@ export const PeoplePage = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const sex = searchParams.get('sex') || null;
   const centuries = searchParams.getAll('centuries');
   const query = searchParams.get('query') || '';
+  const order = searchParams.get('order') || '';
 
   const sortBy = searchParams.get('sort') || '';
 
-  console.log(sortBy);
+  function sortedPeople(sort, isOrder): Person[] {
+    if (!sortBy) {
+      return people;
+    }
 
-  const sortedPeople = [...people].sort((a, b) =>
-    String(a[sortBy as keyof Person]).localeCompare(
-      String(b[sortBy as keyof Person]),
-    ),
-  );
+    const validFields = ['name', 'sex', 'born', 'died'];
 
-  const filteredPeople = sortedPeople.filter(person => {
+    if (validFields.includes(sort)) {
+      return [...people].sort((a, b) => {
+        let comparison = 0;
+
+        switch (sortBy) {
+          case 'name':
+          case 'sex':
+            comparison = a[sort].localeCompare(b[sort]);
+            break;
+
+          case 'born':
+          case 'died':
+            comparison = a[sort] - b[sort];
+            break;
+        }
+
+        return isOrder === 'desc' ? -comparison : comparison;
+      });
+    }
+
+    return people;
+  }
+
+  const sorted = sortedPeople(sortBy, order) || [];
+
+  const filteredPeople = sorted.filter(person => {
     const matchesSex = !sex || person.sex === sex;
 
     const selectedCenturies = centuries.map(Number);
     const personCentury = Math.ceil(person.born / 100);
 
-    const matchesQuery = !query || person.name.includes(query);
+    const normalizedQuery = query.toLowerCase();
+
+    const matchesQuery =
+      !query ||
+      person.name.toLowerCase().includes(normalizedQuery) ||
+      person.motherName?.toLowerCase().includes(normalizedQuery) ||
+      person.fatherName?.toLowerCase().includes(normalizedQuery);
 
     const matchesCentury =
       selectedCenturies.length === 0 ||
@@ -41,12 +72,6 @@ export const PeoplePage = () => {
 
     return matchesSex && matchesCentury && matchesQuery;
   });
-
-  // const sortedFilteredPeople = [...filteredPeople].sort((a, b) =>
-  //   String(a[sortBy as keyof Person]).localeCompare(
-  //     String(b[sortBy as keyof Person]),
-  //   ),
-  // );
 
   useEffect(() => {
     setLoading(true);
