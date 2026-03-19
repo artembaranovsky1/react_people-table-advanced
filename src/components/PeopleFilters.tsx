@@ -8,7 +8,7 @@ export const PeopleFilters = () => {
   const query = searchParams.get('query') || '';
   const hasCenturies = searchParams.has('centuries');
 
-  const toggleCentury = century => {
+  const toggleCentury = (century: number) => {
     const newParams = new URLSearchParams(searchParams);
     const value = century.toString();
 
@@ -24,7 +24,7 @@ export const PeopleFilters = () => {
     setSearchParams(newParams);
   };
 
-  const handleFilterChange = (key, value) => {
+  const handleFilterChange = (key: string, value: string | null) => {
     const newParams = new URLSearchParams(searchParams);
 
     if (value === null) {

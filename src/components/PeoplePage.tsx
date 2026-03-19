@@ -20,30 +20,30 @@ export const PeoplePage = () => {
 
   const sortBy = searchParams.get('sort') || '';
 
-  function sortedPeople(sort, isOrder): Person[] {
+  function sortedPeople(sortingBy, orderStatus): Person[] {
     if (!sortBy) {
       return people;
     }
 
     const validFields = ['name', 'sex', 'born', 'died'];
 
-    if (validFields.includes(sort)) {
+    if (validFields.includes(sortingBy)) {
       return [...people].sort((a, b) => {
         let comparison = 0;
 
         switch (sortBy) {
           case 'name':
           case 'sex':
-            comparison = a[sort].localeCompare(b[sort]);
+            comparison = a[sortingBy].localeCompare(b[sortingBy]);
             break;
 
           case 'born':
           case 'died':
-            comparison = a[sort] - b[sort];
+            comparison = a[sortingBy] - b[sortingBy];
             break;
         }
 
-        return isOrder === 'desc' ? -comparison : comparison;
+        return orderStatus === 'desc' ? -comparison : comparison;
       });
     }
 

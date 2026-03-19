@@ -1,6 +1,6 @@
 import React from 'react';
 import { Person } from '../types';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 
 type Props = {
   person: Person;
@@ -9,6 +9,7 @@ type Props = {
 
 export const PersonLink: React.FC<Props> = ({ person, people }) => {
   const { slug } = useParams();
+  const location = useLocation();
 
   const motherIsActive =
     person.motherName && people.some(p => p.name === person.motherName);
@@ -30,7 +31,11 @@ export const PersonLink: React.FC<Props> = ({ person, people }) => {
       <td>
         <Link
           className={person.sex === 'f' ? 'has-text-danger' : ''}
-          to={`/people/${person.slug}`}
+          // to={`/people/${person.slug}`}
+          to={{
+            pathname: `/people/${person.slug}`,
+            search: location.search,
+          }}
         >
           {person.name}
         </Link>
